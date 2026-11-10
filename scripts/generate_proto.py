@@ -19,12 +19,12 @@ PROTO_FILES = [
     "ai_service.proto",
 ]
 
-print(f"Generando código cliente gRPC desde {PROTO_DIR} → {OUT_DIR}")
+print(f"Generando codigo cliente gRPC desde {PROTO_DIR} -> {OUT_DIR}")
 
 for proto in PROTO_FILES:
     proto_path = PROTO_DIR / proto
     if not proto_path.exists():
-        print(f"  ⚠️  No encontrado: {proto_path}")
+        print(f"  [WARN] No encontrado: {proto_path}")
         continue
 
     cmd = [
@@ -36,15 +36,15 @@ for proto in PROTO_FILES:
     ]
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode == 0:
-        print(f"  ✅ {proto}")
+        print(f"  [OK] {proto}")
     else:
-        print(f"  ❌ {proto}:\n{result.stderr}")
+        print(f"  [ERROR] {proto}:\n{result.stderr}")
 
 print("\nCorrigiendo imports...")
 for py_file in OUT_DIR.glob("*.py"):
     if py_file.name == "__init__.py":
         continue
-    content = py_file.read_text()
+    content = py_file.read_text(encoding="utf-8")
     fixed = content
     for proto in PROTO_FILES:
         module_name = proto.replace(".proto", "_pb2")
@@ -55,4 +55,4 @@ for py_file in OUT_DIR.glob("*.py"):
     if fixed != content:
         py_file.write_text(fixed)
 
-print("✅ Código cliente gRPC generado.")
+print("Codigo cliente gRPC generado.")

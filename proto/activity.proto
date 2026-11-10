@@ -1,13 +1,12 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 package runsense.activity.v1;
 
 import "google/protobuf/timestamp.proto";
 import "common.proto";
 
-option python_package = "generated";
 
-// Métricas de una actividad de carrera normalizada
+// MÃ©tricas de una actividad de carrera normalizada
 message ActivityMetrics {
   string activity_id = 1;
   google.protobuf.Timestamp started_at = 2;
@@ -27,7 +26,7 @@ message ActivityMetrics {
   runsense.common.v1.DataSource data_source = 16;
 }
 
-// Muestra individual de frecuencia cardíaca
+// Muestra individual de frecuencia cardÃ­aca
 message HeartRateSample {
   double elapsed_seconds = 1;
   int32 heart_rate_bpm = 2;

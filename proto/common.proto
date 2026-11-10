@@ -1,10 +1,9 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 package runsense.common.v1;
 
 import "google/protobuf/timestamp.proto";
 
-option python_package = "generated";
 
 // Enum para la fuente/origen de un dato
 enum DataSource {
@@ -12,7 +11,7 @@ enum DataSource {
   DATA_SOURCE_DEVICE = 1;      // Medido por dispositivo
   DATA_SOURCE_USER_INPUT = 2;  // Declarado por el usuario
   DATA_SOURCE_ESTIMATED = 3;   // Estimado por el modelo
-  DATA_SOURCE_SYNTHETIC = 4;   // Dato sintético / demo
+  DATA_SOURCE_SYNTHETIC = 4;   // Dato sintÃ©tico / demo
 }
 
 // Calidad del dato

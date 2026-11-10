@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 package runsense.prediction.v1;
 
@@ -6,9 +6,8 @@ import "google/protobuf/timestamp.proto";
 import "common.proto";
 import "activity.proto";
 
-option python_package = "generated";
 
-// Solicitud de predicción de rendimiento
+// Solicitud de predicciÃ³n de rendimiento
 message PredictionRequest {
   string runner_id = 1;
   string correlation_id = 2;
@@ -19,7 +18,7 @@ message PredictionRequest {
   google.protobuf.Timestamp requested_at = 7;
 }
 
-// Perfil básico del corredor para contexto del modelo
+// Perfil bÃ¡sico del corredor para contexto del modelo
 message RunnerProfile {
   optional int32 age = 1;
   optional double weight_kg = 2;
@@ -28,7 +27,7 @@ message RunnerProfile {
   string primary_goal = 5;
 }
 
-// Factor explicativo de la predicción
+// Factor explicativo de la predicciÃ³n
 message ExplanatoryFactor {
   string feature_name = 1;
   double importance = 2;
@@ -43,7 +42,7 @@ message UncertaintyInterval {
   double confidence_level = 3;    // 0.0-1.0
 }
 
-// Respuesta de predicción
+// Respuesta de predicciÃ³n
 message PredictionResponse {
   string runner_id = 1;
   string correlation_id = 2;
@@ -61,7 +60,7 @@ message PredictionResponse {
   bool is_extrapolation = 14;  // true si se extrapola fuera del historial observado
 }
 
-// Solicitud de estimación de capacidad observada
+// Solicitud de estimaciÃ³n de capacidad observada
 message CapacityRequest {
   string runner_id = 1;
   string correlation_id = 2;

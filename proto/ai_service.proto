@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 package runsense.ai.v1;
 
@@ -9,9 +9,8 @@ import "recommendation.proto";
 import "activity.proto";
 import "common.proto";
 
-option python_package = "generated";
 
-// Solicitud de detección de anomalías
+// Solicitud de detecciÃ³n de anomalÃ­as
 message AnomalyDetectionRequest {
   string runner_id = 1;
   string correlation_id = 2;
@@ -19,17 +18,17 @@ message AnomalyDetectionRequest {
   google.protobuf.Timestamp requested_at = 4;
 }
 
-// Anomalía detectada
+// AnomalÃ­a detectada
 message DetectedAnomaly {
   string anomaly_type = 1;
-  double score = 2;           // Cuán atípico es (mayor = más anómalo)
+  double score = 2;           // CuÃ¡n atÃ­pico es (mayor = mÃ¡s anÃ³malo)
   string description = 3;
   string context = 4;
   google.protobuf.Timestamp activity_date = 5;
   string activity_id = 6;
 }
 
-// Respuesta de detección de anomalías
+// Respuesta de detecciÃ³n de anomalÃ­as
 message AnomalyDetectionResponse {
   string runner_id = 1;
   string correlation_id = 2;
@@ -42,7 +41,7 @@ message AnomalyDetectionResponse {
   string model_version = 9;
 }
 
-// Información del modelo activo
+// InformaciÃ³n del modelo activo
 message ModelInfoRequest {
   string runner_id = 1;
   string model_type = 2;  // "prediction", "anomaly", "capacity"
@@ -69,7 +68,7 @@ message HealthCheckResponse {
 }
 
 // ============================================================
-// Servicio principal de IA — RunnerAIService
+// Servicio principal de IA â€” RunnerAIService
 // ============================================================
 service RunnerAIService {
 
@@ -77,15 +76,15 @@ service RunnerAIService {
   rpc PredictPerformance (runsense.prediction.v1.PredictionRequest)
       returns (runsense.prediction.v1.PredictionResponse);
 
-  // Estima la capacidad física observada del corredor
+  // Estima la capacidad fÃ­sica observada del corredor
   rpc EstimateCapacity (runsense.prediction.v1.CapacityRequest)
       returns (runsense.prediction.v1.CapacityResponse);
 
-  // Analiza patrones de esfuerzo y recuperación
+  // Analiza patrones de esfuerzo y recuperaciÃ³n
   rpc AnalyzeRecovery (runsense.recovery.v1.RecoveryAnalysisRequest)
       returns (runsense.recovery.v1.RecoveryAnalysisResponse);
 
-  // Detecta anomalías en el historial de entrenamientos
+  // Detecta anomalÃ­as en el historial de entrenamientos
   rpc DetectAnomalies (AnomalyDetectionRequest)
       returns (AnomalyDetectionResponse);
 
@@ -93,7 +92,7 @@ service RunnerAIService {
   rpc GenerateRecommendations (runsense.recommendation.v1.RecommendationRequest)
       returns (runsense.recommendation.v1.RecommendationResponse);
 
-  // Devuelve información sobre los modelos activos
+  // Devuelve informaciÃ³n sobre los modelos activos
   rpc GetModelInformation (ModelInfoRequest)
       returns (ModelInfoResponse);
 

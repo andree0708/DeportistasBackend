@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 package runsense.recommendation.v1;
 
@@ -7,9 +7,8 @@ import "activity.proto";
 import "recovery.proto";
 import "common.proto";
 
-option python_package = "generated";
 
-// Tipos de recomendación
+// Tipos de recomendaciÃ³n
 enum RecommendationType {
   RECOMMENDATION_TYPE_UNSPECIFIED = 0;
   RECOMMENDATION_TYPE_LOAD_ADJUSTMENT = 1;
@@ -37,7 +36,7 @@ message RecommendationRequest {
   google.protobuf.Timestamp requested_at = 6;
 }
 
-// Recomendación individual
+// RecomendaciÃ³n individual
 message Recommendation {
   string id = 1;
   RecommendationType type = 2;

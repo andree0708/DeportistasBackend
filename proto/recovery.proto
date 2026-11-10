@@ -1,4 +1,4 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 package runsense.recovery.v1;
 
@@ -6,9 +6,8 @@ import "google/protobuf/timestamp.proto";
 import "common.proto";
 import "activity.proto";
 
-option python_package = "generated";
 
-// Métricas de recuperación de una sesión
+// MÃ©tricas de recuperaciÃ³n de una sesiÃ³n
 message RecoveryMetrics {
   string runner_id = 1;
   google.protobuf.Timestamp date = 2;
@@ -23,7 +22,7 @@ message RecoveryMetrics {
   runsense.common.v1.DataSource data_source = 11;
 }
 
-// Solicitud de análisis de recuperación
+// Solicitud de anÃ¡lisis de recuperaciÃ³n
 message RecoveryAnalysisRequest {
   string runner_id = 1;
   string correlation_id = 2;
@@ -32,7 +31,7 @@ message RecoveryAnalysisRequest {
   google.protobuf.Timestamp requested_at = 5;
 }
 
-// Señal de alerta en recuperación
+// SeÃ±al de alerta en recuperaciÃ³n
 message RecoverySignal {
   string signal_type = 1;
   double severity = 2;      // 0.0-1.0
@@ -41,7 +40,7 @@ message RecoverySignal {
   google.protobuf.Timestamp detected_at = 5;
 }
 
-// Respuesta del análisis de recuperación
+// Respuesta del anÃ¡lisis de recuperaciÃ³n
 message RecoveryAnalysisResponse {
   string runner_id = 1;
   string correlation_id = 2;
