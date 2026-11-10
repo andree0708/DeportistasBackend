@@ -6,6 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "prediction.proto";
 import "recovery.proto";
 import "recommendation.proto";
+import "narrative.proto";
 import "activity.proto";
 import "common.proto";
 
@@ -91,6 +92,10 @@ service RunnerAIService {
   // Genera recomendaciones personalizadas
   rpc GenerateRecommendations (runsense.recommendation.v1.RecommendationRequest)
       returns (runsense.recommendation.v1.RecommendationResponse);
+
+  // Genera un analisis narrativo con LLM a partir de datos observados
+  rpc GenerateNarrative (runsense.narrative.v1.NarrativeRequest)
+      returns (runsense.narrative.v1.NarrativeResponse);
 
   // Devuelve informaciÃ³n sobre los modelos activos
   rpc GetModelInformation (ModelInfoRequest)

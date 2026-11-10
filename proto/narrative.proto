@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package runsense.narrative.v1;
+
+import "google/protobuf/timestamp.proto";
+import "activity.proto";
+import "common.proto";
+
+// Analisis narrativo generado por LLM a partir de datos observados.
+// El texto es explicativo: no son mediciones clinicas ni garantias.
+message NarrativeRequest {
+  string runner_id = 1;
+  string correlation_id = 2;
+  // Tipo de analisis: "weekly_report" | "prediction_explainer" | "recovery_brief"
+  string kind = 3;
+  // Foco opcional en texto libre (ej. "10K", "semana 7")
+  string focus = 4;
+  runsense.activity.v1.ActivityHistory history = 5;
+  // Contexto serializado por el backend: ultimas predicciones,
+  // anomalias, recomendaciones y metricas de recuperacion.
+  string context_json = 6;
+  google.protobuf.Timestamp requested_at = 7;
+}
+
+message NarrativeResponse {
+  string runner_id = 1;
+  string correlation_id = 2;
+  bool success = 3;
+  // Texto explicativo en formato Markdown (espanol).
+  string narrative_markdown = 4;
+  // Modelo LLM usado (ej. "llama-3.3-70b-versatile").
+  string model = 5;
+  int32 prompt_tokens = 6;
+  int32 completion_tokens = 7;
+  repeated string warnings = 8;
+  repeated runsense.common.v1.ProcessingError errors = 9;
+  google.protobuf.Timestamp generated_at = 10;
+  string model_version = 11;
+}

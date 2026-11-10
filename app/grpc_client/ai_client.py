@@ -352,6 +352,48 @@ class AIServiceClient:
 
     # ------------------------------------------------------------------ helpers
 
+    def generate_narrative(self, runner_id: str, activities_data: list,
+                           kind: str, focus: str, context_json: str,
+                           timeout: int = 90) -> dict:
+        """Solicita un analisis narrativo con LLM (Groq)."""
+        try:
+            from app.grpc_client.generated import narrative_pb2, activity_pb2
+        except ImportError:
+            raise RuntimeError("Código gRPC no generado")
+
+        stub = self._get_stub()
+        correlation_id = self._correlation_id()
+
+        activity_metrics = self._build_activity_metrics_list(activities_data)
+        history = activity_pb2.ActivityHistory(
+            runner_id=runner_id,
+            activities=activity_metrics,
+            total_count=len(activity_metrics),
+        )
+        request = narrative_pb2.NarrativeRequest(
+            runner_id=runner_id,
+            correlation_id=correlation_id,
+            kind=kind or "weekly_report",
+            focus=focus or "",
+            history=history,
+            context_json=context_json or "{}",
+            requested_at=_dt_to_proto(datetime.now(timezone.utc)),
+        )
+        try:
+            response = stub.GenerateNarrative(request, timeout=timeout)
+            return {
+                "success": response.success,
+                "narrative_markdown": response.narrative_markdown,
+                "model": response.model,
+                "prompt_tokens": response.prompt_tokens,
+                "completion_tokens": response.completion_tokens,
+                "warnings": list(response.warnings),
+                "model_version": response.model_version,
+            }
+        except grpc.RpcError as e:
+            logger.error("gRPC GenerateNarrative error: %s", e.details())
+            return {"success": False, "error": str(e.details())}
+
     def _build_activity_metrics_list(self, activities_data: list) -> list:
         try:
             from app.grpc_client.generated import activity_pb2, common_pb2

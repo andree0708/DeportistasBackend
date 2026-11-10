@@ -16,6 +16,7 @@ PROTO_FILES = [
     "prediction.proto",
     "recovery.proto",
     "recommendation.proto",
+    "narrative.proto",
     "ai_service.proto",
 ]
 

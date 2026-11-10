@@ -1,5 +1,7 @@
 """Endpoints de recomendaciones y detección de anomalías."""
+import json
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import get_current_user
@@ -7,10 +9,18 @@ from app.db.base import get_db
 from app.models.user import User
 from app.models.runner import RunnerProfile
 from app.models.activity import Activity, ActivityMetric
-from app.models.ai_results import Recommendation, AnomalyDetection
+from app.models.ai_results import (
+    Recommendation, AnomalyDetection, PerformancePrediction,
+)
+from app.models.recovery import RecoveryMetric
 from app.grpc_client.ai_client import ai_client
 
 router = APIRouter(prefix="/recommendations", tags=["Recomendaciones"])
+
+
+class NarrativeRequestSchema(BaseModel):
+    kind: str = "weekly_report"  # weekly_report | prediction_explainer | recovery_brief
+    focus: str = ""
 
 
 def _get_profile(user: User, db: Session) -> RunnerProfile:
@@ -184,3 +194,93 @@ def list_anomalies(
         }
         for a in anomalies
     ]
+
+
+@router.post("/narrative")
+def generate_narrative(
+    payload: NarrativeRequestSchema,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Genera un analisis narrativo con LLM (Groq) a partir de datos observados.
+
+    No persiste nada: el texto se genera al momento con las ultimas
+    predicciones, anomalias, recomendaciones y metricas de recuperacion.
+    """
+    profile = _get_profile(current_user, db)
+    activities_data = _get_activities_data(profile, db)
+
+    if len(activities_data) < 3:
+        raise HTTPException(422, "Se necesitan al menos 3 actividades para el analisis narrativo")
+
+    preds = (
+        db.query(PerformancePrediction)
+        .filter(PerformancePrediction.runner_profile_id == profile.id,
+                PerformancePrediction.status == "completed")
+        .order_by(PerformancePrediction.generated_at.desc())
+        .limit(10)
+        .all()
+    )
+    anoms = (
+        db.query(AnomalyDetection)
+        .filter(AnomalyDetection.runner_profile_id == profile.id)
+        .order_by(AnomalyDetection.detected_at.desc())
+        .limit(10)
+        .all()
+    )
+    recs = (
+        db.query(Recommendation)
+        .filter(Recommendation.runner_profile_id == profile.id)
+        .order_by(Recommendation.generated_at.desc())
+        .limit(10)
+        .all()
+    )
+    recov = (
+        db.query(RecoveryMetric)
+        .filter(RecoveryMetric.runner_profile_id == profile.id)
+        .order_by(RecoveryMetric.metric_date.desc())
+        .limit(14)
+        .all()
+    )
+    context = {
+        "profile": {
+            "age": profile.age,
+            "experience_years": profile.experience_years,
+            "primary_goal": profile.primary_goal,
+        },
+        "predictions": [
+            {"distancia_km": p.target_distance_km,
+             "tiempo_s": p.predicted_time_seconds,
+             "ritmo_s_km": p.predicted_pace_sec_per_km,
+             "extrapolacion": p.is_extrapolation}
+            for p in preds
+        ],
+        "anomalies": [
+            {"tipo": a.anomaly_type, "score": a.score,
+             "descripcion": a.description, "contexto": a.context}
+            for a in anoms
+        ],
+        "recommendations": [
+            {"tipo": r.recommendation_type, "prioridad": r.priority,
+             "titulo": r.title, "explicacion": r.explanation}
+            for r in recs
+        ],
+        "recovery": [
+            {"fecha": str(m.metric_date),
+             "fc_reposo": m.resting_heart_rate_bpm, "hrv_ms": m.hrv_ms,
+             "score": m.recovery_score}
+            for m in recov
+        ],
+    }
+
+    kind = (payload.kind or "weekly_report").strip()
+    if kind not in ("weekly_report", "prediction_explainer", "recovery_brief"):
+        raise HTTPException(422, "kind debe ser weekly_report, prediction_explainer o recovery_brief")
+
+    return ai_client.generate_narrative(
+        runner_id=str(profile.id),
+        activities_data=activities_data,
+        kind=kind,
+        focus=(payload.focus or "").strip(),
+        context_json=json.dumps(context, ensure_ascii=False, default=str),
+    )
