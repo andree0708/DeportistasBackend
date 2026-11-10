@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package runsense.activity.v1;
+
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+
+option python_package = "generated";
+
+// Métricas de una actividad de carrera normalizada
+message ActivityMetrics {
+  string activity_id = 1;
+  google.protobuf.Timestamp started_at = 2;
+  double distance_meters = 3;
+  double duration_seconds = 4;
+  double avg_pace_sec_per_km = 5;
+  double avg_speed_kmh = 6;
+  optional double avg_heart_rate_bpm = 7;
+  optional double max_heart_rate_bpm = 8;
+  optional double avg_cadence_spm = 9;
+  optional double elevation_gain_meters = 10;
+  optional double elevation_loss_meters = 11;
+  optional double avg_altitude_meters = 12;
+  optional int32 perceived_effort = 13;    // 1-10 RPE
+  optional double training_load = 14;
+  string activity_type = 15;              // "run", "trail_run", etc.
+  runsense.common.v1.DataSource data_source = 16;
+}
+
+// Muestra individual de frecuencia cardíaca
+message HeartRateSample {
+  double elapsed_seconds = 1;
+  int32 heart_rate_bpm = 2;
+}
+
+// Muestra individual de ritmo
+message PaceSample {
+  double elapsed_seconds = 1;
+  double pace_sec_per_km = 2;
+  double distance_meters = 3;
+}
+
+// Historial completo de actividades para inferencia
+message ActivityHistory {
+  string runner_id = 1;
+  repeated ActivityMetrics activities = 2;
+  int32 total_count = 3;
+  google.protobuf.Timestamp history_from = 4;
+  google.protobuf.Timestamp history_to = 5;
+}

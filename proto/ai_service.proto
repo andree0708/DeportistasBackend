@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package runsense.ai.v1;
+
+import "google/protobuf/timestamp.proto";
+import "prediction.proto";
+import "recovery.proto";
+import "recommendation.proto";
+import "activity.proto";
+import "common.proto";
+
+option python_package = "generated";
+
+// Solicitud de detección de anomalías
+message AnomalyDetectionRequest {
+  string runner_id = 1;
+  string correlation_id = 2;
+  runsense.activity.v1.ActivityHistory history = 3;
+  google.protobuf.Timestamp requested_at = 4;
+}
+
+// Anomalía detectada
+message DetectedAnomaly {
+  string anomaly_type = 1;
+  double score = 2;           // Cuán atípico es (mayor = más anómalo)
+  string description = 3;
+  string context = 4;
+  google.protobuf.Timestamp activity_date = 5;
+  string activity_id = 6;
+}
+
+// Respuesta de detección de anomalías
+message AnomalyDetectionResponse {
+  string runner_id = 1;
+  string correlation_id = 2;
+  bool success = 3;
+  repeated DetectedAnomaly anomalies = 4;
+  string method_used = 5;
+  repeated string warnings = 6;
+  repeated runsense.common.v1.ProcessingError errors = 7;
+  google.protobuf.Timestamp generated_at = 8;
+  string model_version = 9;
+}
+
+// Información del modelo activo
+message ModelInfoRequest {
+  string runner_id = 1;
+  string model_type = 2;  // "prediction", "anomaly", "capacity"
+}
+
+message ModelInfoResponse {
+  string model_name = 1;
+  string model_version = 2;
+  string algorithm = 3;
+  int32 training_samples = 4;
+  google.protobuf.Timestamp trained_at = 5;
+  map<string, double> evaluation_metrics = 6;
+  bool is_personalized = 7;
+  repeated string feature_names = 8;
+}
+
+// Health check
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  string status = 1;      // "SERVING", "NOT_SERVING"
+  string version = 2;
+  map<string, string> component_status = 3;
+}
+
+// ============================================================
+// Servicio principal de IA — RunnerAIService
+// ============================================================
+service RunnerAIService {
+
+  // Predice el rendimiento para una distancia objetivo
+  rpc PredictPerformance (runsense.prediction.v1.PredictionRequest)
+      returns (runsense.prediction.v1.PredictionResponse);
+
+  // Estima la capacidad física observada del corredor
+  rpc EstimateCapacity (runsense.prediction.v1.CapacityRequest)
+      returns (runsense.prediction.v1.CapacityResponse);
+
+  // Analiza patrones de esfuerzo y recuperación
+  rpc AnalyzeRecovery (runsense.recovery.v1.RecoveryAnalysisRequest)
+      returns (runsense.recovery.v1.RecoveryAnalysisResponse);
+
+  // Detecta anomalías en el historial de entrenamientos
+  rpc DetectAnomalies (AnomalyDetectionRequest)
+      returns (AnomalyDetectionResponse);
+
+  // Genera recomendaciones personalizadas
+  rpc GenerateRecommendations (runsense.recommendation.v1.RecommendationRequest)
+      returns (runsense.recommendation.v1.RecommendationResponse);
+
+  // Devuelve información sobre los modelos activos
+  rpc GetModelInformation (ModelInfoRequest)
+      returns (ModelInfoResponse);
+
+  // Health check del servicio de IA
+  rpc CheckHealth (HealthCheckRequest)
+      returns (HealthCheckResponse);
+}

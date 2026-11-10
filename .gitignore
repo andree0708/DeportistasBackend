@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+!.env.example
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+
+# Alembic (conservar versions/, ignorar pycache)
+**/__pycache__/
+
+# Uploads locales y generados gRPC (se regeneran con scripts/generate_proto.py)
+uploads/
+app/grpc_client/generated/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

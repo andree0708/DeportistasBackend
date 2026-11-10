@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package runsense.common.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option python_package = "generated";
+
+// Enum para la fuente/origen de un dato
+enum DataSource {
+  DATA_SOURCE_UNSPECIFIED = 0;
+  DATA_SOURCE_DEVICE = 1;      // Medido por dispositivo
+  DATA_SOURCE_USER_INPUT = 2;  // Declarado por el usuario
+  DATA_SOURCE_ESTIMATED = 3;   // Estimado por el modelo
+  DATA_SOURCE_SYNTHETIC = 4;   // Dato sintético / demo
+}
+
+// Calidad del dato
+enum DataQuality {
+  DATA_QUALITY_UNSPECIFIED = 0;
+  DATA_QUALITY_HIGH = 1;
+  DATA_QUALITY_MEDIUM = 2;
+  DATA_QUALITY_LOW = 3;
+  DATA_QUALITY_MISSING = 4;
+}
+
+// Distancias de carrera soportadas
+enum RaceDistance {
+  RACE_DISTANCE_UNSPECIFIED = 0;
+  RACE_DISTANCE_5K = 1;
+  RACE_DISTANCE_10K = 2;
+  RACE_DISTANCE_15K = 3;
+  RACE_DISTANCE_HALF_MARATHON = 4;  // 21.1 km
+  RACE_DISTANCE_CUSTOM = 5;
+}
+
+// Metadato de campo con trazabilidad
+message FieldMetadata {
+  DataSource source = 1;
+  DataQuality quality = 2;
+  string notes = 3;
+}
+
+// Error de procesamiento estructurado
+message ProcessingError {
+  string code = 1;
+  string message = 2;
+  string field = 3;
+}

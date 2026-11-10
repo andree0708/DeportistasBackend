@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package runsense.recommendation.v1;
+
+import "google/protobuf/timestamp.proto";
+import "activity.proto";
+import "recovery.proto";
+import "common.proto";
+
+option python_package = "generated";
+
+// Tipos de recomendación
+enum RecommendationType {
+  RECOMMENDATION_TYPE_UNSPECIFIED = 0;
+  RECOMMENDATION_TYPE_LOAD_ADJUSTMENT = 1;
+  RECOMMENDATION_TYPE_RECOVERY = 2;
+  RECOMMENDATION_TYPE_PACE_REVIEW = 3;
+  RECOMMENDATION_TYPE_PATTERN_CHANGE = 4;
+  RECOMMENDATION_TYPE_GENERAL = 5;
+}
+
+// Prioridad
+enum RecommendationPriority {
+  RECOMMENDATION_PRIORITY_UNSPECIFIED = 0;
+  RECOMMENDATION_PRIORITY_LOW = 1;
+  RECOMMENDATION_PRIORITY_MEDIUM = 2;
+  RECOMMENDATION_PRIORITY_HIGH = 3;
+}
+
+// Solicitud de recomendaciones
+message RecommendationRequest {
+  string runner_id = 1;
+  string correlation_id = 2;
+  runsense.activity.v1.ActivityHistory history = 3;
+  repeated runsense.recovery.v1.RecoveryMetrics recovery_data = 4;
+  string primary_goal = 5;
+  google.protobuf.Timestamp requested_at = 6;
+}
+
+// Recomendación individual
+message Recommendation {
+  string id = 1;
+  RecommendationType type = 2;
+  RecommendationPriority priority = 3;
+  string title = 4;
+  string explanation = 5;
+  repeated string supporting_data_points = 6;
+  google.protobuf.Timestamp generated_at = 7;
+}
+
+// Respuesta de recomendaciones
+message RecommendationResponse {
+  string runner_id = 1;
+  string correlation_id = 2;
+  bool success = 3;
+  repeated Recommendation recommendations = 4;
+  repeated string warnings = 5;
+  repeated runsense.common.v1.ProcessingError errors = 6;
+  google.protobuf.Timestamp generated_at = 7;
+  string model_version = 8;
+}

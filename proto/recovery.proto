@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package runsense.recovery.v1;
+
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+import "activity.proto";
+
+option python_package = "generated";
+
+// Métricas de recuperación de una sesión
+message RecoveryMetrics {
+  string runner_id = 1;
+  google.protobuf.Timestamp date = 2;
+  optional double resting_heart_rate_bpm = 3;
+  optional double hrv_ms = 4;
+  optional double sleep_hours = 5;
+  optional double sleep_quality_score = 6;    // 0-100
+  optional double recovery_score = 7;         // estimado por dispositivo
+  optional double training_load_7d = 8;
+  optional double training_load_28d = 9;
+  repeated string subjective_notes = 10;
+  runsense.common.v1.DataSource data_source = 11;
+}
+
+// Solicitud de análisis de recuperación
+message RecoveryAnalysisRequest {
+  string runner_id = 1;
+  string correlation_id = 2;
+  runsense.activity.v1.ActivityHistory history = 3;
+  repeated RecoveryMetrics recovery_data = 4;
+  google.protobuf.Timestamp requested_at = 5;
+}
+
+// Señal de alerta en recuperación
+message RecoverySignal {
+  string signal_type = 1;
+  double severity = 2;      // 0.0-1.0
+  string description = 3;
+  string recommendation = 4;
+  google.protobuf.Timestamp detected_at = 5;
+}
+
+// Respuesta del análisis de recuperación
+message RecoveryAnalysisResponse {
+  string runner_id = 1;
+  string correlation_id = 2;
+  bool success = 3;
+  optional double current_fatigue_index = 4;
+  optional double recovery_trend = 5;    // positivo=mejorando, negativo=empeorando
+  repeated RecoverySignal signals = 6;
+  repeated string warnings = 7;
+  repeated runsense.common.v1.ProcessingError errors = 8;
+  google.protobuf.Timestamp generated_at = 9;
+  string model_version = 10;
+}
