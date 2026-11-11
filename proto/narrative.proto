@@ -28,7 +28,7 @@ message NarrativeResponse {
   bool success = 3;
   // Texto explicativo en formato Markdown (espanol).
   string narrative_markdown = 4;
-  // Modelo LLM usado (ej. "llama-3.3-70b-versatile").
+  // Modelo LLM usado (ej. "openai/gpt-oss-120b").
   string model = 5;
   int32 prompt_tokens = 6;
   int32 completion_tokens = 7;
